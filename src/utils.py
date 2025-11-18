@@ -3,6 +3,8 @@ import pickle
 import dill
 from sklearn.metrics import r2_score
 from sklearn.model_selection import GridSearchCV
+from src.exception import customException
+import sys
 
 
 def save_object_preprocessor(file_path,obj):
@@ -70,3 +72,11 @@ def eval_models(X_train, y_train, X_test, y_test, models, params):
         test_scores[model_name] = r2_score(y_test, y_test_pred)
             
     return train_scores, test_scores
+
+def load_object(file_path):
+    try:
+        with open(file_path,'rb') as file:
+            obj=dill.load(file)
+        return obj
+    except Exception as e:
+        raise customException(e,sys)
