@@ -1,1 +1,29 @@
+# 1. Environment Folders (Most Crucial)
+# These folders contain all the downloaded libraries (which are huge).
+venv/
+env/
+.venv/
+# Add the specific folder name that caused the problem:
+giri/ 
+*.tar.gz
+*.whl
 
+# 2. Python Bytecode
+# Compiled Python files—no need to track these.
+__pycache__/
+*.pyc
+
+# 3. Data and Model Artifacts (Use Git LFS or DVC instead)
+# These files are often large and should not be tracked directly by Git.
+# Only use this if you plan to use Git LFS or if they are generated locally.
+*.csv
+*.xlsx
+*.model
+*.pkl
+*.h5
+*.pth
+
+# 4. Operating System and Editor Files
+.DS_Store
+.ipynb_checkpoints/
+*~
