@@ -1,7 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.preprocessing import StandardScaler, OneHotEncoder,OrdinalEncoder,FunctionTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder,OrdinalEncoder
+from sklearn.impute import SimpleImputer
 import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline 
@@ -22,30 +23,47 @@ class DataTransformation:
     
     def get_transformation_obj(self):
         try:
-            numerical_columns = ["writing_score", "reading_score"]
-            ordinal_columns = ["parental_level_of_education"]
-            nominal_columns = [
-                "gender",
-                "race_ethnicity",
-                "lunch",
-                "test_preparation_course",
-              ]
+            numerical_cols = ["writing_score", "reading_score"]
+            ordinal_impute_col = ["parental_level_of_education"] 
+            nominal_impute_col = ["race_ethnicity"]
+            nominal_mandatory_cols = ["gender", "lunch", "test_preparation_course"]
+
 
             logging.info(f'data transformation initiated')
 
-            Scaling_transformer=StandardScaler()
-            OneHot_transformer=OneHotEncoder(sparse_output=False,handle_unknown='ignore',drop='first')
-            education_order = [
-                 ['some high school', 'high school', 'some college', "associate's degree", "bachelor's degree", "master's degree"]
-                        ]
-            ord_transformer = OrdinalEncoder(categories=education_order)
+        
+            num_pipeline = Pipeline(steps=[
+            ('imputer', SimpleImputer(strategy='median')),  
+            ('scaler', StandardScaler())
+                ])
 
-            preprocessor=ColumnTransformer(
-                [
-                    ('scale',Scaling_transformer,numerical_columns),
-                    ('ordinal',ord_transformer,ordinal_columns),   
-                    ('onehot',OneHot_transformer,nominal_columns)           
-                ],verbose_feature_names_out=False)
+            education_order = [
+             ['some high school', 'high school', 'some college', "associate's degree", "bachelor's degree", "master's degree"]
+                ]
+            ord_impute_pipeline = Pipeline(steps=[
+            
+            ('imputer', SimpleImputer(strategy='most_frequent')), 
+            ('encoder', OrdinalEncoder(categories=education_order))
+            ])
+
+        
+            nom_impute_pipeline = Pipeline(steps=[
+            
+            ('imputer', SimpleImputer(strategy='most_frequent')), 
+            ('encoder', OneHotEncoder(sparse_output=False, handle_unknown='ignore', drop='first'))
+            ])
+        
+            nom_mandatory_encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore', drop='first')
+
+            preprocessor = ColumnTransformer(
+                transformers=[
+                    ('num_pipe', num_pipeline, numerical_cols),
+                    ('ord_impute', ord_impute_pipeline, ordinal_impute_col), 
+                    ('nom_impute', nom_impute_pipeline, nominal_impute_col),
+                    ('nom_mandatory', nom_mandatory_encoder, nominal_mandatory_cols) 
+             ],
+                verbose_feature_names_out=False
+                )
             logging.info(f'Preprocessor object created and is ready to be returned.')
             return preprocessor
             
