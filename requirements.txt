@@ -6,4 +6,5 @@ pickle
 scikit-learn
 catboost
 xgboost
+dill
 -e .

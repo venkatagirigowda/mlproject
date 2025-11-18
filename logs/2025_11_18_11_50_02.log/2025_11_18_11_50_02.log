@@ -1,0 +1,11 @@
+[2025-11-18 11:50:04,020] INFO - Entered the data ingestion method or component
+[2025-11-18 11:50:04,023] INFO - Read the dataset as dataframe
+[2025-11-18 11:50:04,027] INFO - train_test splits intiated 
+[2025-11-18 11:50:04,031] INFO - Ingestion of the data is completed
+[2025-11-18 11:50:04,034] INFO - applying preprocessing
+[2025-11-18 11:50:04,034] INFO - data transformation initiated
+[2025-11-18 11:50:04,034] INFO - Preprocessor object created and is ready to be returned.
+[2025-11-18 11:50:04,044] INFO - preprocessing object saved
+[2025-11-18 11:50:04,045] INFO - splitting training and test input data
+[2025-11-18 11:50:05,027] INFO - Best found model on testing dataset: LinearRegression with Test R2 Score: 0.8816
+[2025-11-18 11:50:05,029] INFO - Diagnostic: Best model's Train R2 Score: 0.8737

@@ -1,0 +1,9 @@
+[2025-11-18 11:39:59,246] INFO - Entered the data ingestion method or component
+[2025-11-18 11:39:59,248] INFO - Read the dataset as dataframe
+[2025-11-18 11:39:59,251] INFO - train_test splits intiated 
+[2025-11-18 11:39:59,254] INFO - Ingestion of the data is completed
+[2025-11-18 11:39:59,257] INFO - applying preprocessing
+[2025-11-18 11:39:59,257] INFO - data transformation initiated
+[2025-11-18 11:39:59,257] INFO - Preprocessor object created and is ready to be returned.
+[2025-11-18 11:39:59,264] INFO - preprocessing object saved
+[2025-11-18 11:39:59,265] INFO - splitting training and test input data

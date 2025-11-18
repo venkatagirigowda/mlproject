@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from src.logger import logging
 from src.exception import CustomException
 import sys
-from src.utils import save_object
+from src.utils import save_object_preprocessor
 
 @dataclass
 class DataTransformationConfig:
@@ -80,7 +80,7 @@ class DataTransformation:
             logging.info(f"preprocessing object saved")
              
             #saveobject function is in utils.py
-            save_object(file_path=self.data_transformation.preprocessor_obj_file_path,
+            save_object_preprocessor(file_path=self.data_transformation.preprocessor_obj_file_path,
                         obj=preprocessing_obj)
             
             return (
