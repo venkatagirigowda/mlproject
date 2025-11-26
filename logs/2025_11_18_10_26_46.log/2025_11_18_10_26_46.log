@@ -1,9 +1,0 @@
-[2025-11-18 10:26:47,074] INFO - NumExpr defaulting to 12 threads.
-[2025-11-18 10:26:50,402] INFO - Entered the data ingestion method or component
-[2025-11-18 10:26:50,408] INFO - Read the dataset as dataframe
-[2025-11-18 10:26:50,414] INFO - train_test splits intiated 
-[2025-11-18 10:26:50,420] INFO - Ingestion of the data is completed
-[2025-11-18 10:26:50,425] INFO - applying preprocessing
-[2025-11-18 10:26:50,425] INFO - data transformation initiated
-[2025-11-18 10:26:50,425] INFO - Preprocessor object created and is ready to be returned.
-[2025-11-18 10:26:50,448] INFO - preprocessing object saved
