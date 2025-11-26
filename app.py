@@ -1,132 +1,59 @@
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 import numpy as np
 import pandas as pd
 import uvicorn
-import os
-import sys
-from pathlib import Path
+from typing import Annotated
+from src.pipeline.predict_pipeline import PredictPipeline
 
-sys.path.append(str(Path(__file__).parent.parent.resolve()))
+app=FastAPI()
 
-try:
-    from src.pipeline.predict_pipeline import CustomData, PredictPipeline
-except ImportError:
+class StudentData(BaseModel):
+    gender: Annotated[str, Field(title="Gender", description="Enter the gender", examples=["male", "female"])]
+    race_ethnicity: Annotated[str ,Field(title="Race/Ethinicity",description="Enter the group of ethnicity",examples=["group A","group B","group C","group D","group E"])]
+    parental_level_of_education: Annotated[str, Field(title="Parental Level of Education", description="Enter the highest level of education attained by the parent(s)", examples=["some high school", "high school", "some college", "associate's degree", "bachelor's degree", "master's degree"])]
+    lunch: Annotated[str, Field(title="Lunch", description="Enter the type of lunch", examples=["standard", "free/reduced"])]
+    test_preparation_course: Annotated[str, Field(title="Test Preparation Course", description="Enter the test preparation course status", examples=["none", "completed"])]
+    reading_score: Annotated[float, Field(title="Reading Score", description="Enter the reading score", examples=[72])]
+    writing_score: Annotated[float, Field(title="Writing Score", description="Enter the writing score", examples=[77])]
 
-    class CustomData:
-        def __init__(self, **kwargs): 
-            self.data = {}
-            for k, v in kwargs.items():
-                if v == '' or v is None:
-                    self.data[k] = np.nan
-                else:
-                    self.data[k] = v
-            
-        def get_data_as_data_frame(self): 
-            feature_order = [
-                'gender', 'race_ethnicity', 'parental_level_of_education', 
-                'lunch', 'test_preparation_course', 'reading_score', 'writing_score'
-            ]
-            
-            return pd.DataFrame([self.data], columns=feature_order)
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request : Request):
+    templates = Jinja2Templates(directory=".")
+    return templates.TemplateResponse("index.html", {"request": request})
 
+@app.post("/predict", response_class=HTMLResponse)
+async def predict(request: Request,
+                  gender: Annotated[str, Form()],
+                  race_ethnicity: Annotated[str, Form()],
+                  parental_level_of_education: Annotated[str, Form()],
+                  lunch: Annotated[str, Form()],
+                  test_preparation_course: Annotated[str, Form()],
+                  reading_score: Annotated[float, Form()],
+                  writing_score: Annotated[float, Form()]):
+    templates = Jinja2Templates(directory=".")
 
-    class PredictPipeline:
-        def predict(self, df):
-            print("--- Mock Prediction Run ---")
-            print("Input Data received by Pipeline:")
-            print(df)
-            return [75.5] 
-
-    print("WARNING: CustomData and PredictPipeline imports failed. Using mock classes.")
-
-
-app = FastAPI(title="Student Performance Prediction API")
-
-templates = Jinja2Templates(directory=".") 
-
-
-class PredictionInput(BaseModel):
-    gender: str
-    ethnicity: str = None 
-    lunch: str
-    test_preparation_course: str
-    writing_score: float
-    reading_score: float
-    
-    parental_level_of_education: str = None
-
-    @classmethod
-    def as_form(cls, 
-                gender: str = Form(...), 
-                ethnicity: str = Form(None),
-                parental_level_of_education: str = Form(None), 
-                lunch: str = Form(...),
-                test_preparation_course: str = Form(...),
-                writing_score: float = Form(...),
-                reading_score: float = Form(...)):
-        return cls(
+    try:
+        input_data = StudentData(
             gender=gender,
-            ethnicity=ethnicity,
+            race_ethnicity=race_ethnicity,
             parental_level_of_education=parental_level_of_education,
             lunch=lunch,
             test_preparation_course=test_preparation_course,
-            writing_score=writing_score,
-            reading_score=reading_score
-        )
-
-@app.get("/", response_class=HTMLResponse)
-async def read_root(request: Request):
-    """Route for the home page."""
-    return templates.TemplateResponse("index.html", {"request": request, "results": None})
-
-@app.post("/predictdata", response_class=HTMLResponse)
-async def predict_datapoint(
-    request: Request, 
-    data: PredictionInput = Depends(PredictionInput.as_form)
-):
-    """Route for handling the form submission and prediction."""
-    try:
-        custom_data_object = CustomData(
-            gender=data.gender,
-            race_ethnicity=data.ethnicity, 
-            parental_level_of_education=data.parental_level_of_education,
-            lunch=data.lunch,
-            test_preparation_course=data.test_preparation_course,
-            reading_score=data.reading_score,
-            writing_score=data.writing_score
-        )
-
-    
-        pred_df = custom_data_object.get_data_as_data_frame()
-        print(f"Prediction Dataframe:\n{pred_df}")
-
-      
+            reading_score=reading_score,
+            writing_score=writing_score)
+        input_df = pd.DataFrame([input_data.model_dump()])
         predict_pipeline = PredictPipeline()
-        results = predict_pipeline.predict(pred_df)
+        result = predict_pipeline.predict(input_df)
+        result = predict_pipeline.predict(input_df)
+        predicted_score = result[0]
+        predicted_score = max(0, min(100, predicted_score))
+        predicted_score = round(predicted_score, 2)
 
-      
-        final_result = f"{results[0]:.2f}"
-        
-        
-        return templates.TemplateResponse(
-            "index.html", 
-            {"request": request, "results": final_result}
-        )
-
+        return templates.TemplateResponse("index.html", {"request": request, "predicted_score": predicted_score})
     except Exception as e:
-        
-        import traceback
-        print(f"Prediction Error: {e}")
-        traceback.print_exc()
-        
-        
-        return templates.TemplateResponse(
-            "index.html", 
-            {"request": request, "results": f"Prediction Failed: Check console for trace. Error: {e}"}
-        )
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+        return templates.TemplateResponse("index.html", {"request": request, "error": str(e)})
+if __name__=="__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

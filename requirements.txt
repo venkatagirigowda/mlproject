@@ -1,11 +1,10 @@
 pandas
-numpy
-seaborn
-matplotlib
-pickle
+numpy==1.24.4
 scikit-learn
-catboost
-xgboost
 dill
 fastapi
+uvicorn[standard]
+jinja2
+joblib
+python-multipart
 -e .

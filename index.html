@@ -4,116 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Performance Prediction</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f7f7f7; }
-        .card { max-width: 600px; }
-        label { font-weight: 600; }
-        /* Style for mandatory and optional fields */
-        input[type="number"][required], select[required] {
-            border: 2px solid #3b82f6; /* Blue border for mandatory */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
         }
-        input[type="number"]:not([required]), select:not([required]) {
-            border: 1px solid #ccc; /* Standard border for optional */
-        }
-        input[type="number"], select {
+        input, select {
             width: 100%;
+            padding: 8px;
+            margin: 6px 0 15px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
             padding: 10px;
-            border-radius: 6px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
-            background-color: white;
+            background: #e8ffe8;
+            border: 1px solid #4CAF50;
+        }
+        .error {
+            margin-top: 20px;
+            padding: 10px;
+            background: #ffe8e8;
+            border: 1px solid red;
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body>
 
-    <div class="card bg-white p-8 rounded-xl shadow-2xl border-t-8 border-indigo-600">
-        <h1 class="text-3xl font-bold mb-6 text-gray-800 text-center">Student Score Predictor</h1>
-        
-        <p class="text-sm text-center text-gray-600 mb-6">Fields marked with a blue border are mandatory.</p>
-        
-        <form action="/predictdata" method="post" class="space-y-4">
+    <h2>Student Score Prediction</h2>
 
-            <!-- Gender (Mandatory) -->
-            <div>
-                <label for="gender" class="block text-sm text-gray-700 mb-1">Gender (Mandatory)</label>
-                <select id="gender" name="gender" required>
-                    <option value="" disabled selected>Select Gender</option>
-                    <option value="female">Female</option>
-                    <option value="male">Male</option>
-                </select>
-            </div>
+    <form action="/predict" method="post">
 
-            <!-- Race/Ethnicity (Optional - Imputed) -->
-            <div>
-                <label for="ethnicity" class="block text-sm text-gray-700 mb-1">Race/Ethnicity (Optional)</label>
-                <select id="ethnicity" name="ethnicity">
-                    <option value="" selected>Leave Blank / Select Group</option>
-                    <option value="group A">Group A</option>
-                    <option value="group B">Group B</option>
-                    <option value="group C">Group C</option>
-                    <option value="group D">Group D</option>
-                    <option value="group E">Group E</option>
-                </select>
-            </div>
+        <label>Gender:</label>
+        <select name="gender">
+            <option>male</option>
+            <option>female</option>
+        </select>
 
-            <!-- Parental Education (Optional - Imputed) -->
-            <div>
-                <label for="parental_level_of_education" class="block text-sm text-gray-700 mb-1">Parental Level of Education (Optional)</label>
-                <select id="parental_level_of_education" name="parental_level_of_education">
-                    <option value="" selected>Leave Blank / Select Level</option>
-                    <option value="some high school">Some High School</option>
-                    <option value="high school">High School</option>
-                    <option value="some college">Some College</option>
-                    <option value="associate's degree">Associate's Degree</option>
-                    <option value="bachelor's degree">Bachelor's Degree</option>
-                    <option value="master's degree">Master's Degree</option>
-                </select>
-            </div>
+        <label>Race/Ethnicity:</label>
+        <select name="race_ethnicity">
+            <option>group A</option>
+            <option>group B</option>
+            <option>group C</option>
+            <option>group D</option>
+            <option>group E</option>
+        </select>
 
-            <!-- Lunch (Mandatory) -->
-            <div>
-                <label for="lunch" class="block text-sm text-gray-700 mb-1">Lunch (Mandatory)</label>
-                <select id="lunch" name="lunch" required>
-                    <option value="" disabled selected>Select Lunch Type</option>
-                    <option value="standard">Standard</option>
-                    <option value="free/reduced">Free/Reduced</option>
-                </select>
-            </div>
+        <label>Parental Level of Education:</label>
+        <select name="parental_level_of_education">
+            <option>some high school</option>
+            <option>high school</option>
+            <option>some college</option>
+            <option>associate's degree</option>
+            <option>bachelor's degree</option>
+            <option>master's degree</option>
+        </select>
 
-            <!-- Test Preparation Course (Mandatory) -->
-            <div>
-                <label for="test_preparation_course" class="block text-sm text-gray-700 mb-1">Test Preparation Course (Mandatory)</label>
-                <select id="test_preparation_course" name="test_preparation_course" required>
-                    <option value="" disabled selected>Select Status</option>
-                    <option value="none">None</option>
-                    <option value="completed">Completed</option>
-                </select>
-            </div>
+        <label>Lunch:</label>
+        <select name="lunch">
+            <option>standard</option>
+            <option>free/reduced</option>
+        </select>
 
-            <!-- Reading Score (Mandatory) -->
-            <div>
-                <label for="reading_score" class="block text-sm text-gray-700 mb-1">Reading Score (0-100) (Mandatory)</label>
-                <input type="number" id="reading_score" name="reading_score" min="0" max="100" required>
-            </div>
+        <label>Test Preparation Course:</label>
+        <select name="test_preparation_course">
+            <option>none</option>
+            <option>completed</option>
+        </select>
 
-            <!-- Writing Score (Mandatory) -->
-            <div>
-                <label for="writing_score" class="block text-sm text-gray-700 mb-1">Writing Score (0-100) (Mandatory)</label>
-                <input type="number" id="writing_score" name="writing_score" min="0" max="100" required>
-            </div>
+        <label>Reading Score:</label>
+        <input type="number" step="0.01"  name="reading_score" required min="0" max="100">
 
-            <button type="submit" class="w-full bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition duration-150 ease-in-out font-medium mt-4">Predict Math Score</button>
-        </form>
+        <label>Writing Score:</label>
+        <input type="number" step="0.01"  name="writing_score" required min="0" max="100">
 
-        <!-- Results Display -->
-        {% if results is not none %}
-        <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-            <h2 class="text-xl font-semibold text-green-800">Prediction Result</h2>
-            <p class="mt-2 text-2xl font-bold text-green-700">The Predicted Math Score is: {{ results }}</p>
-        </div>
-        {% endif %}
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if predicted_score %}
+    <div class="result">
+        <strong>Predicted Score: </strong> {{ predicted_score }}
     </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="error">
+        <strong>Error:</strong> {{ error }}
+    </div>
+    {% endif %}
 
 </body>
 </html>
