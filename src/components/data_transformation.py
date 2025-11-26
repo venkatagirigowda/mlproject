@@ -12,6 +12,7 @@ from src.logger import logging
 from src.exception import CustomException
 import sys
 from src.utils import save_object_preprocessor
+print(np.__version__)
 
 @dataclass
 class DataTransformationConfig:
